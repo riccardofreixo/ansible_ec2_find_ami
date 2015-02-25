@@ -1,0 +1,13 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - ec2_find_ami:
+        region: eu-west-1
+        filters:
+          'tag:mp:service': ddo
+          'asd': asd
+      register: results
+
+    - debug: var=results
