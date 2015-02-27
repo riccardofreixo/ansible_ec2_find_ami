@@ -4,7 +4,7 @@
 # Copyright 2015 Riccardo Freixo
 
 """
-Simple module to find AMI IDs based on attribute filters
+Simple Ansible module to find AMI IDs based on attribute filters
 """
 
 DOCUMENTATION = '''
@@ -195,6 +195,14 @@ EXAMPLES = '''
     region: eu-west-1
     owners: amazon
     virtualization_type: hvm
+
+# Find and register all self-owned AMIs with root device type instance-store
+- ec2_find_ami:
+    region: eu-west-1
+    root_device_type: instance-store
+  register: my_instance_store_amis
+
+- debug: var=my_instance_store_amis
 '''
 
 import sys
@@ -253,8 +261,8 @@ def parse_filters(module):
     :rtype: dict
     :return: a dict with filters compatible with boto.ec2.connection.get_all_images
     """
-    filters = {v: module.params.get(k) for k, v in SEARCH_FILTERS.iteritems() if module.params.get(k) is not None}
-    if module.params.get('tags') is not None:
+    filters = {v: module.params.get(k) for k, v in SEARCH_FILTERS.iteritems() if k in module.params}
+    if 'tags' in module.params:
         filters.update({'tag:'+key: value for key, value in module.params.get('tags').iteritems()})
     return filters
 
